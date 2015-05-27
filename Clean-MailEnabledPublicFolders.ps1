@@ -57,7 +57,7 @@ Param(
 
 Set-StrictMode -Version Latest
 
-$PublicFolders = Get-MailPublicFolder -ResultSize 10
+$PublicFolders = Get-MailPublicFolder -ResultSize Unlimited
 
 $max = ($PublicFolders | Measure-Object).Count
 $pf = 0
