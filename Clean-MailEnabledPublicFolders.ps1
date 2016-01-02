@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-    Remove proxy addressess for a selected protocol from mailo enabled public folders
+     
    
    	Thomas Stensitzki
 	
