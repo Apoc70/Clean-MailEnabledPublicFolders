@@ -17,7 +17,7 @@
     .DESCRIPTION
 	This script removes the proxy address(es) for a selected protocol from mail enabled public folders.
     
-    The script can fix the alias of mail enabled public folders as well. The code used is based opton a blog post by Shay Levy.
+    The script can fix the alias of mail enabled public folders as well. The code used is based opon a blog post by Shay Levy.
     http://blogs.microsoft.co.il/scriptfanatic/2011/08/15/exchange-removing-illegal-alias-characters-using-powershell/
 
     .NOTES 
@@ -43,12 +43,12 @@
     Switch to fix mail enabled public folder alias (mailNickname) and to remove illegal characters
  
 	.EXAMPLE
-    Check mal enabled public folders for proxy addresses having "MS:" as a protocol type.
+    Check mail enabled public folders for proxy addresses having "MS:" as a protocol type.
     Do not remove and update addresses, but log found addresses to RemovedAddresses.txt
     .\Clean-EmailEnabledPublicFolders.ps1 -ProtocolToRemove "MS:*" 
 
     .EXAMPLE
-    Check mal enabled public folders for proxy addresses having "MS:" as a protocol type.
+    Check mail enabled public folders for proxy addresses having "MS:" as a protocol type.
     Remove and update addresses and log found addresses to RemovedAddresses.txt
     .\Clean-EmailEnabledPublicFolders.ps1 -ProtocolToRemove "MS:*" -UpdateAddresses
 
