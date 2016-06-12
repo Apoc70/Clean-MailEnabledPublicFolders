@@ -7,7 +7,7 @@
 	THIS CODE IS MADE AVAILABLE AS IS, WITHOUT WARRANTY OF ANY KIND. THE ENTIRE 
 	RISK OF THE USE OR THE RESULTS FROM THE USE OF THIS CODE REMAINS WITH THE USER.
 	
-	Version 1.1, 2016-01-21
+	Version 1.11, 2016-06-12
 
     Ideas, comments and suggestions to support@granikos.eu 
  
@@ -29,6 +29,7 @@
     -------------------------------------------------------------------------------- 
     1.0     Initial community release 
     1.1     FixAlias added, cleanup logic changed
+    1.11    Just a little PowerShell hygiene applied
 	
 	.PARAMETER ProtocolToRemove
     Proxy address protocol to remove, e.g. "MS:*", "CCMAIL:*"
@@ -57,13 +58,13 @@ Param(
     [parameter(Mandatory=$true,ValueFromPipeline=$false,HelpMessage='Proxy address protocol to remove')][string]$ProtocolToRemove,  
     [parameter(Mandatory=$false,ValueFromPipeline=$false,HelpMessage='Update proxy addresses by removing found protocol addresses')][switch]$UpdateAddresses,
     [parameter(Mandatory=$false,ValueFromPipeline=$false,HelpMessage='Fix Alias to remove illegalcharacters')][switch]$FixAlias,
-    [parameter(Mandatory=$false,ValueFromPipeline=$false,HelpMessage='File name for output file')][string]$OutputFile = "RemovedAddresses.txt"
+    [parameter(Mandatory=$false,ValueFromPipeline=$false,HelpMessage='File name for output file')][string]$OutputFile = 'RemovedAddresses.txt'
 
 )
 
 Set-StrictMode -Version Latest
 
-Write-Host "Please wait. Fetching mail enabled public folder..."
+Write-Host 'Please wait. Fetching mail enabled public folder...'
 $PublicFolders = Get-MailPublicFolder -ResultSize Unlimited
 
 $max = ($PublicFolders | Measure-Object).Count
@@ -81,14 +82,14 @@ Write-Host "$($max) mail enabled public folders fetched from Active Directory"
 Write-Host "Updating mail enabled public folders having $($ProtocolToRemove) addresses"
 
 if ($UpdateAddresses) {
-    Write-Host "Email addresses will be updated!"
+    Write-Host 'Email addresses will be updated!'
 }
 else {
-    Write-Host "Email addresses will NOT be updated. Dry run only!" 
+    Write-Host 'Email addresses will NOT be updated. Dry run only!' 
 }
 
 # Write file header
-$line = "Name;ProxyAddress;OldAlias;NewAlias"
+$line = 'Name;ProxyAddress;OldAlias;NewAlias'
 $line | Out-File (Join-Path -Path $ScriptDir $OutputFile) -Append -Encoding utf8
 
 foreach($Folder in $PublicFolders) {
@@ -147,6 +148,6 @@ foreach($Folder in $PublicFolders) {
     $pf++
 }
 
-Write-Host "Script finished!"
+Write-Host 'Script finished!'
 Write-Host "$($pf) folders parsed, $($found) folders with $($ProtocolToRemove) address found, $($updated) folders updated, $($fixed) aliases fixed"
 Write-Host "Check output file $($OutputFile) for found/updated public folders"
