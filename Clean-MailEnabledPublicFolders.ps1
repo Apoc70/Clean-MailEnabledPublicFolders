@@ -12,7 +12,7 @@
     Ideas, comments and suggestions to support@granikos.eu 
  
     .LINK  
-    More information can be found at http://www.granikos.eu/en/scripts 
+    More information can be found at http://scripts.granikos.eu 
 
     .DESCRIPTION
 	This script removes the proxy address(es) for a selected protocol from mail enabled public folders.
