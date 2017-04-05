@@ -1,23 +1,21 @@
 # Clean-MailEnabledPublicFolders.ps1
 Remove proxy addressess for a selected protocol from mailo enabled public folders
 
-##Description
+## Description
 This script removes the proxy address(es) for a selected protocol from mail enabled public folders.
 
-##Inputs
-ProtocolToRemove
+## Parameters
+### ProtocolToRemove
 Proxy address protocol to remove, e.g. "MS:*", "CCMAIL:*"
 
-UpdateAddresses
+### UpdateAddresses
 Update proxy addresses by removing found protocol addresses
 
-OutputFile
+### OutputFile
 File name for output file, default: RemovedAddresses.txt
 
-##Outputs
-Removed address are written to an output file
 
-##Examples
+## Examples
 ```
 .\Clean-EmailEnabledPublicFolders.ps1 -ProtocolToRemove "MS:*"
 ```
@@ -30,23 +28,23 @@ Do not remove and update addresses, but log found addresses to RemovedAddresses.
 Check mal enabled public folders for proxy addresses having "MS:" as a protocol type.
 Remove and update addresses and log found addresses to RemovedAddresses.txt
 
-##TechNet Gallery
+## TechNet Gallery
 Find the script at TechNet Gallery
 * https://gallery.technet.microsoft.com/Script-to-remove-unwanted-9d119c6b
 
 
-##Credits
+## Credits
 Written by: Thomas Stensitzki
 
-Find me on:
+Stay connected:
 
-* My Blog:	http://www.sf-tools.net/
-* Twitter:	https://twitter.com/stensitzki
+* My Blog: http://justcantgetenough.granikos.eu
+* Twitter: https://twitter.com/stensitzki
 * LinkedIn:	http://de.linkedin.com/in/thomasstensitzki
-* Github:	https://github.com/Apoc70
+* Github: https://github.com/Apoc70
 
 For more Office 365, Cloud Security and Exchange Server stuff checkout services provided by Granikos
 
-* Blog:     http://blog.granikos.eu/
-* Website:	https://www.granikos.eu/en/
-* Twitter:	https://twitter.com/granikos_de
+* Blog: http://blog.granikos.eu/
+* Website: https://www.granikos.eu/en/
+* Twitter: https://twitter.com/granikos_de
