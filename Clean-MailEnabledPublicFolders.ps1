@@ -1,153 +1,122 @@
 <#
     .SYNOPSIS
-    Remove proxy addressess for a selected protocol from mail enabled public folders and fix aliases
+    Remove proxy addressess for a selected protocol from mailto enabled public folders
    
-   	Thomas Stensitzki
+    Thomas Stensitzki
 	
-	THIS CODE IS MADE AVAILABLE AS IS, WITHOUT WARRANTY OF ANY KIND. THE ENTIRE 
-	RISK OF THE USE OR THE RESULTS FROM THE USE OF THIS CODE REMAINS WITH THE USER.
+    THIS CODE IS MADE AVAILABLE AS IS, WITHOUT WARRANTY OF ANY KIND. THE ENTIRE 
+    RISK OF THE USE OR THE RESULTS FROM THE USE OF THIS CODE REMAINS WITH THE USER.
 	
-	Version 1.11, 2016-06-12
+    Version 1.1, 2017-09-18
 
     Ideas, comments and suggestions to support@granikos.eu 
  
     .LINK  
-    More information can be found at http://scripts.granikos.eu 
-
+    http://www.granikos.eu/en/scripts 
+	
     .DESCRIPTION
-	This script removes the proxy address(es) for a selected protocol from mail enabled public folders.
-    
-    The script can fix the alias of mail enabled public folders as well. The code used is based opon a blog post by Shay Levy.
-    http://blogs.microsoft.co.il/scriptfanatic/2011/08/15/exchange-removing-illegal-alias-characters-using-powershell/
+    This script removes the proxy address(es) for a selected protocol from mail enabled public folders.
 
     .NOTES 
     Requirements 
     - Windows Server 2008 R2 SP1, Windows Server 2012 or Windows Server 2012 R2  
-    - Exchange Server 2010/2013
+    - Exchange Server 2010/2013/2016
 
     Revision History 
     -------------------------------------------------------------------------------- 
     1.0     Initial community release 
-    1.1     FixAlias added, cleanup logic changed
-    1.11    Just a little PowerShell hygiene applied
+    1.1     Some minor fixes
 	
-	.PARAMETER ProtocolToRemove
+    .PARAMETER ProtocolToRemove
     Proxy address protocol to remove, e.g. "MS:*", "CCMAIL:*"
 
     .PARAMETER UpdateAddresses
-    Switch to update proxy addresses by removing found addresses matching protocol provided in parameter ProtocolToRemove
+    Update proxy addresses by removing found protocol addresses
 
     .PARAMETER OutputFile
     File name for output file, default: RemovedAddresses.txt
-    
-    .PARAMETER FixAlias
-    Switch to fix mail enabled public folder alias (mailNickname) and to remove illegal characters
  
-	.EXAMPLE
-    Check mail enabled public folders for proxy addresses having "MS:" as a protocol type.
+    .EXAMPLE
+    Check mal enabled public folders for proxy addresses having "MS:" as a protocol type.
     Do not remove and update addresses, but log found addresses to RemovedAddresses.txt
-    .\Clean-EmailEnabledPublicFolders.ps1 -ProtocolToRemove "MS:*" 
+    .\Clean-MailEnabledPublicFolders.ps1 -ProtocolToRemove "MS:*" 
 
     .EXAMPLE
-    Check mail enabled public folders for proxy addresses having "MS:" as a protocol type.
+    Check mal enabled public folders for proxy addresses having "MS:" as a protocol type.
     Remove and update addresses and log found addresses to RemovedAddresses.txt
-    .\Clean-EmailEnabledPublicFolders.ps1 -ProtocolToRemove "MS:*" -UpdateAddresses
+    .\Clean-MailEnabledPublicFolders.ps1 -ProtocolToRemove "MS:*" -UpdateAddresses
 
-    #>
+#>
 Param(
-    [parameter(Mandatory=$true,ValueFromPipeline=$false,HelpMessage='Proxy address protocol to remove')][string]$ProtocolToRemove,  
-    [parameter(Mandatory=$false,ValueFromPipeline=$false,HelpMessage='Update proxy addresses by removing found protocol addresses')][switch]$UpdateAddresses,
-    [parameter(Mandatory=$false,ValueFromPipeline=$false,HelpMessage='Fix Alias to remove illegalcharacters')][switch]$FixAlias,
-    [parameter(Mandatory=$false,ValueFromPipeline=$false,HelpMessage='File name for output file')][string]$OutputFile = 'RemovedAddresses.txt'
+  [parameter(Mandatory,HelpMessage='Proxy address protocol to remove')][string]$ProtocolToRemove,  
+  [switch]$UpdateAddresses,
+  [string]$OutputFile = 'RemovedAddresses.txt'
 
 )
 
-Set-StrictMode -Version Latest
+# Set-StrictMode -Version Latest
 
-Write-Host 'Please wait. Fetching mail enabled public folder...'
+# Fetch all public folders
 $PublicFolders = Get-MailPublicFolder -ResultSize Unlimited
 
+# Do some presets
 $max = ($PublicFolders | Measure-Object).Count
-$pf = 0
+$publicFoldersCount = 0
 $updated = 0
 $found = 0
-$fixed = 0
 
-# Thanks to Shay Levy
-$IllegalCharacters = 0..34+40..41+44,47+58..60+62+64+91..93+127..160
+$ScriptDir = Split-Path -Path $script:MyInvocation.MyCommand.Path
 
-$ScriptDir = Split-Path $script:MyInvocation.MyCommand.Path
-
-Write-Host "$($max) mail enabled public folders fetched from Active Directory"
-Write-Host "Updating mail enabled public folders having $($ProtocolToRemove) addresses"
+Write-Host 'Script started!'
+Write-Host ('Updating mail enabled public folders having {0} addresses' -f $ProtocolToRemove)
 
 if ($UpdateAddresses) {
-    Write-Host 'Email addresses will be updated!'
+  Write-Host 'Email addresses will be updated!'
 }
 else {
-    Write-Host 'Email addresses will NOT be updated. Dry run only!' 
+  Write-Host 'Email addresses will NOT be updated. Dry run only!' 
 }
-
-# Write file header
-$line = 'Name;ProxyAddress;OldAlias;NewAlias'
-$line | Out-File (Join-Path -Path $ScriptDir $OutputFile) -Append -Encoding utf8
 
 foreach($Folder in $PublicFolders) {
 
-    # Write some nice progress bar
-    Write-Progress -Activity "Checking Public Folder $($Folder.Name)" -Status "Object ($pf/$max)" -PercentComplete((($pf+1)/$max)*100)
+  # Some nice progrsss bar
+  Write-Progress -Activity ('Checking Public Folder {0}' -f $Folder.Name) -Status ('Object ({0}/{1})' -f $publicFoldersCount, $max) -PercentComplete((($publicFoldersCount+1)/$max)*100)
     
-    $proxyUpdated = $false
-    $aliasUpdated = $false
+  $proxyUpdated = $false
     
-    for ($i=0;$i -lt $Folder.EmailAddresses.Count; $i++)
+  for ($i=0;$i -lt $Folder.EmailAddresses.Count; $i++)
+  {
+    # Fetch proxy addresses
+    $address = $Folder.EmailAddresses[$i]
+
+    if ($address.IsPrimaryAddress -eq $true -and $address.ProxyAddressString -like $ProtocolToRemove )
     {
-        $address = $Folder.EmailAddresses[$i]
-        $newAlias = $Folder.Alias
-        
-        # Thanks to Shay Levy
-        # Check alias for each illegal character
-        foreach ($char in $IllegalCharacters) {
-
-            $escapedChar = [regex]::Escape([char]$char)
-
-            if($newAlias -match $escapedChar){
-                $newAlias = $newAlias -replace $escapedChar
-            }
-        }
-        
-        $aliasUpdated = ($Folder.Alias -ne $newAlias)
-
-        if ($address.IsPrimaryAddress -eq $true -and $address.ProxyAddressString -like $ProtocolToRemove )
-        {
-            # Yes, we've found an address to remove
-            $found++
-            $proxyUpdated = $true
-         
-            # Remove found proxy address
-            $Folder.EmailAddresses.RemoveAt($i)
+      $found++
+      $proxyUpdated = $true
             
-            # log folder name, address and alias to file
-            $line = "$($Folder.Name);$($address.ProxyAddressString);$($Folder.Alias);$($newAlias)"
-            $line | Out-File (Join-Path -Path $ScriptDir $OutputFile) -Append -Encoding utf8
+      # Remove found proxy address
+      $Folder.EmailAddresses.RemoveAt($i)
 
-            $i--
-        }
-    }
+      # Fix alias (mailNickname), if required
+      if($Folder.Alias.Contains(' ')) {
+        $Folder.Alias = $Folder.Alias.ToString().Replace(' ','-')
+      }
 
-    if($UpdateAddresses -and $proxyUpdated) { 
-        Set-MailPublicFolder -Identity $Folder.Identity -EmailAddresses $Folder.EmailAddresses
-        $updated++
-    }
-    
-    if($FixAlias -and $aliasUpdated) {
-        Set-MailPublicFolder -Identity $Folder.Identity -Alias $newAlias
-        $fixed++
-    }
+      $line = ('{0};{1};{2}' -f $Folder.Name, $address.ProxyAddressString, $Folder.Alias)
+      $line | Out-File -FilePath (Join-Path -Path $ScriptDir -ChildPath $OutputFile) -Append -Encoding utf8
 
-    $pf++
+      $i--
+    }
+  }
+
+  if($UpdateAddresses -and $proxyUpdated) { 
+    Set-MailPublicFolder -Identity $Folder.Identity -EmailAddresses $Folder.EmailAddresses -Alias $Folder.Alias
+    $updated++
+  }
+
+  $publicFoldersCount++
 }
 
 Write-Host 'Script finished!'
-Write-Host "$($pf) folders parsed, $($found) folders with $($ProtocolToRemove) address found, $($updated) folders updated, $($fixed) aliases fixed"
-Write-Host "Check output file $($OutputFile) for found/updated public folders"
+Write-Host ('{0} folders parsed, {1} folders found, {2} folders updated' -f $publicFoldersCount, $found, $updated)
+Write-Host ('Check output file {0} for found/updated public folders' -f $OutputFile)
