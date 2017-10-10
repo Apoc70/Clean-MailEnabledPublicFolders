@@ -7,7 +7,7 @@
     THIS CODE IS MADE AVAILABLE AS IS, WITHOUT WARRANTY OF ANY KIND. THE ENTIRE 
     RISK OF THE USE OR THE RESULTS FROM THE USE OF THIS CODE REMAINS WITH THE USER.
 	
-    Version 1.1, 2017-09-18
+    Version 1.2, 2017-10-10
 
     Ideas, comments and suggestions to support@granikos.eu 
  
@@ -25,7 +25,8 @@
     Revision History 
     -------------------------------------------------------------------------------- 
     1.0     Initial community release 
-    1.1     Some minor fixes
+    1.1     FixAlias added, cleanup logic changed
+    1.2     Some minor PowerShell updates
 	
     .PARAMETER ProtocolToRemove
     Proxy address protocol to remove, e.g. "MS:*", "CCMAIL:*"
