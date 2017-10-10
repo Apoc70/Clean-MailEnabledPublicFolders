@@ -17,13 +17,13 @@ File name for output file, default: RemovedAddresses.txt
 
 ## Examples
 ```
-.\Clean-EmailEnabledPublicFolders.ps1 -ProtocolToRemove "MS:*"
+.\Clean-MailEnabledPublicFolders.ps1 -ProtocolToRemove "MS:*"
 ```
 Check mal enabled public folders for proxy addresses having "MS:" as a protocol type.
 Do not remove and update addresses, but log found addresses to RemovedAddresses.txt
 
 ```
-.\Clean-EmailEnabledPublicFolders.ps1 -ProtocolToRemove "MS:*" -UpdateAddresses
+.\Clean-MailEnabledPublicFolders.ps1 -ProtocolToRemove "MS:*" -UpdateAddresses
 ```
 Check mal enabled public folders for proxy addresses having "MS:" as a protocol type.
 Remove and update addresses and log found addresses to RemovedAddresses.txt
