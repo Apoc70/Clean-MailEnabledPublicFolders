@@ -36,6 +36,11 @@ Do not remove and update addresses, but log found addresses to RemovedAddresses.
 Check mal enabled public folders for proxy addresses having "MS:" as a protocol type.
 Remove and update addresses and log found addresses to RemovedAddresses.txt
 
+## Note
+
+THIS CODE IS MADE AVAILABLE AS IS, WITHOUT WARRANTY OF ANY KIND. THE ENTIRE
+RISK OF THE USE OR THE RESULTS FROM THE USE OF THIS CODE REMAINS WITH THE USER.
+
 ## TechNet Gallery
 
 Find the script at TechNet Gallery
