@@ -41,18 +41,11 @@ Remove and update addresses and log found addresses to RemovedAddresses.txt
 THIS CODE IS MADE AVAILABLE AS IS, WITHOUT WARRANTY OF ANY KIND. THE ENTIRE
 RISK OF THE USE OR THE RESULTS FROM THE USE OF THIS CODE REMAINS WITH THE USER.
 
-## TechNet Gallery
-
-Find the script at TechNet Gallery
-
-* https://gallery.technet.microsoft.com/Script-to-remove-unwanted-9d119c6b
-
-
 ## Credits
 
 Written by: Thomas Stensitzki
 
-Stay connected:
+## Stay connected
 
 * My Blog: [http://justcantgetenough.granikos.eu](http://justcantgetenough.granikos.eu)
 * Twitter: [https://twitter.com/stensitzki](https://twitter.com/stensitzki)
